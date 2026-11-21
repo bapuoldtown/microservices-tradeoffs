@@ -7,9 +7,8 @@
 ```powershell
 docker ps --format "table {{.Names}}\t{{.Ports}}"
 docker exec pg psql -U postgres -c "CREATE DATABASE mbr_outbox_lab;"
-docker exec -i pg psql -U postgres -d mbr_outbox_lab < sql/01_schema.sql
 ```
-**PowerShell note:** the last line's `<` redirection is not supported in Windows PowerShell. Use:
+**Run the SQL files using the PowerShell pipeline:**
 ```powershell
 Get-Content .\sql\01_schema.sql -Raw | docker exec -i pg psql -U postgres -d mbr_outbox_lab
 Get-Content .\sql\02_seed.sql -Raw | docker exec -i pg psql -U postgres -d mbr_outbox_lab
