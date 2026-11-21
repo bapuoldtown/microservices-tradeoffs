@@ -2,6 +2,10 @@
 
 Hands-on distributed-systems engineering: **build → break → observe → fix → explain the trade-offs**.
 
+## 🎮 Play the interactive lesson
+
+[**Save Rahul's Order! — interactive website source**](docs/index.html) · [Enable GitHub Pages](https://github.com/bapuoldtown/microservices-tradeoffs/settings/pages) with **Deploy from a branch → main → /docs** to publish the site. Once enabled, the expected URL is `https://bapuoldtown.github.io/microservices-tradeoffs/` (not verified live yet).
+
 ## Labs
 
 ### [001 — ShopFlow Transactional Outbox](labs/001-transactional-outbox/README.md)
