@@ -68,16 +68,19 @@ def start_checkout(body):
         if existing:
             if (existing["sku"],existing["amount"],existing["fail_mode"]) != (body.sku,body.amount,body.fail_mode):
                 raise HTTPException(409, "Idempotency key reused with different payload")
-            return snapshot(existing["id"])
-        sid = uuid.uuid4()
-        try:
-            conn.execute("""INSERT INTO sagas(id,request_key,sku,amount,state,step,fail_mode)
-              VALUES (%s,%s,%s,%s,'RUNNING','RESERVE',%s)""",
-              (sid,body.request_key,body.sku,body.amount,body.fail_mode))
-        except psycopg.errors.UniqueViolation:
-            conn.rollback()
-            row = conn.execute("SELECT id FROM sagas WHERE request_key=%s",(body.request_key,)).fetchone()
-            return snapshot(row["id"])
+            sid = existing["id"]
+        else:
+            sid = uuid.uuid4()
+            try:
+                conn.execute("""INSERT INTO sagas(id,request_key,sku,amount,state,step,fail_mode)
+                  VALUES (%s,%s,%s,%s,'RUNNING','RESERVE',%s)""",
+                  (sid,body.request_key,body.sku,body.amount,body.fail_mode))
+            except psycopg.errors.UniqueViolation:
+                conn.rollback()
+                row = conn.execute("SELECT id,sku,amount,fail_mode FROM sagas WHERE request_key=%s",(body.request_key,)).fetchone()
+                if not row or (row["sku"],row["amount"],row["fail_mode"]) != (body.sku,body.amount,body.fail_mode):
+                    raise HTTPException(409, "Idempotency key reused with different payload")
+                sid = row["id"]
     return snapshot(sid)
 
 def claim(worker):
@@ -117,7 +120,7 @@ def advance(sid, worker):
             old=conn.execute("SELECT result FROM operations WHERE op_key=%s",(key,)).fetchone()
             if old:
                 result=old["result"]
-            elif s["fail_mode"] == "decline":
+            elif s["fail_mode"] in ("decline", "compensation_once"):
                 result="DECLINED"
                 conn.execute("""INSERT INTO operations VALUES (%s,%s,'CHARGE',%s,now())""",(key,sid,result))
             else:
