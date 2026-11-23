@@ -60,3 +60,7 @@ Rahul's order was saved but its event might not reach the warehouse. Reproduce:
 Please [suggest an improvement or a new incident](https://github.com/bapuoldtown/microservices-tradeoffs/issues/new). Feedback requires a GitHub account. Never paste private credentials into a public issue.
 
 > Educational source and examples. Mission 001 SQL exercises and Mission 002 simulator are not production-ready transaction processing infrastructure.
+
+### Saga Under Fire — failure-driven implementation plan
+
+[Read the complete problem statement, diagrams, ten failure missions, concurrency and fencing trade-offs](labs/002-saga-under-fire/PROJECT-BRIEF.md). **Design only:** the real lab has not been implemented yet; the existing browser simulator remains separate.
